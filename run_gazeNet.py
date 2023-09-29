@@ -97,42 +97,44 @@ for _root, _dir, _files in os.walk('%s/%s'%(args.root, args.dataset)):
                   for _file in fnmatch.filter(_files, "*.npy")])
 
 #test separate files
-for fpath in tqdm(FILES[:]):
-    fdir, fname = os.path.split(os.path.splitext(fpath)[0])
+if __name__ == "__main__":
+    for fpath in tqdm(FILES[:]):
+        fdir, fname = os.path.split(os.path.splitext(fpath)[0])
 
-    #load data
-    X_test = np.load(fpath)
-    _status = np.isnan(X_test['x']) | \
-              np.isnan(X_test['y']) | \
-              ~np.in1d(X_test['evt'], config['events'])
-    X_test['status'] = ~_status
-    test_dataset = EMDataset(config = config, gaze_data = [X_test])
-    n_samples = len(test_dataset)
-    if n_samples<1:
-        continue
-    test_loader = GazeDataLoader(test_dataset, batch_size=config['batch_size'],
-                                 num_workers=args.num_workers,
-                                 shuffle=False)
-    #predict
-    _gt, _pr, pr_raw = run_infer(model, n_samples, test_loader, **kwargs)
+        #load data
+        X_test = np.load(fpath)
+        _status = np.isnan(X_test['x']) | \
+                np.isnan(X_test['y']) | \
+                ~np.in1d(X_test['evt'], config['events'])
+        X_test['status'] = ~_status
+        test_dataset = EMDataset(config = config, gaze_data = [X_test])
+        n_samples = len(test_dataset)
+        if n_samples<1:
+            continue
+        test_loader = GazeDataLoader(test_dataset, batch_size=config['batch_size'],
+                                    num_workers=args.num_workers,
+                                    shuffle=False)
+        #predict
+        print ("Predicting %s" % fname)
+        _gt, _pr, pr_raw = run_infer(model, n_samples, test_loader, **kwargs)
 
-    #glue back the predictions
-    _data_pr = copy.deepcopy(test_dataset.data)
-    for _d, _pred in zip(_data_pr, pr_raw):
-        _d['evt'] = 0
-        _d['evt'][1:] = np.argmax(_pred, axis=1)+1
-    _data_pr = pd.concat([pd.DataFrame(_d) for _d in _data_pr]).reset_index(drop=True)
-    _data = pd.DataFrame(X_test)
-    _data = _data.merge(_data_pr, on='t', suffixes=('', '_pred'), how='left')
-    _data['evt'] = _data['evt_pred'].replace({np.nan:0})
+        #glue back the predictions
+        _data_pr = copy.deepcopy(test_dataset.data)
+        for _d, _pred in zip(_data_pr, pr_raw):
+            _d['evt'] = 0
+            _d['evt'][1:] = np.argmax(_pred, axis=1)+1
+        _data_pr = pd.concat([pd.DataFrame(_d) for _d in _data_pr]).reset_index(drop=True)
+        _data = pd.DataFrame(X_test)
+        _data = _data.merge(_data_pr, on='t', suffixes=('', '_pred'), how='left')
+        _data['evt'] = _data['evt_pred'].replace({np.nan:0})
 
-    #save
-    etdata_pr.load(_data[['t', 'x', 'y', 'status', 'evt']].values, **{'source':'np_array'})
+        #save
+        etdata_pr.load(_data[['t', 'x', 'y', 'status', 'evt']].values, **{'source':'np_array'})
 
-    sdir = fdir.replace(args.dataset, '%s_gazeNet'%args.dataset)
-    mkpath(sdir)
-    spath = '%s/%s'%(sdir, fname)
-    etdata_pr.save(spath)
-    etdata_pr.plot(show=False, save=True, spath='%s'%spath)
+        sdir = fdir.replace(args.dataset, '%s_gazeNet'%args.dataset)
+        mkpath(sdir)
+        spath = '%s/%s'%(sdir, fname)
+        etdata_pr.save(spath)
+        etdata_pr.plot(show=False, save=True, spath='%s'%spath)
 
 
