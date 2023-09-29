@@ -39,18 +39,25 @@ def load(model, model_dir, config, model_name=None):
     fpath_model = "%s/%s" % (logdir, model_name)
     print (fpath_model)
     if os.path.exists(fpath_model) and (model_name is not None):
-        print "Loading model: %s" % fpath_model
+        print ("Loading model: %s" % fpath_model)
 
         package = torch.load(fpath_model, map_location=lambda storage, loc: storage)
         epoch = package['epoch']+1 if not(package['epoch'] == 'N/A') else 1
         #edit variable names for loading in cpu
         #if not(config["cuda"]):
-        for k in package['state_dict'].keys():
-            package['state_dict'][k.replace('module.', '', 1)] = package['state_dict'].pop(k)
+        new_state_dict = {}
+        for k, v in package['state_dict'].items():
+            new_key = k.replace('module.', '', 1)
+            new_state_dict[new_key] = v
+        package['state_dict'] = new_state_dict
+
+        # for k in package['state_dict'].keys():
+        #     package['state_dict'][k.replace('module.', '', 1)] = package['state_dict'].pop(k)
 
         state_dict = dict()
         for k in model.state_dict().keys():
-            if package['state_dict'].has_key(k):
+            # if package['state_dict'].has_key(k):
+            if k in package['state_dict']:
                 state_dict[k] = package['state_dict'][k]
         model_state = model.state_dict()
         model_state.update(state_dict)
@@ -58,7 +65,7 @@ def load(model, model_dir, config, model_name=None):
         print ("done.")
     else:
         epoch = 1
-        print "Pretrained model not found"
+        print ("Pretrained model not found")
     return model_name, epoch
 
 def save(model, model_dir, epoch, step,config):
@@ -154,7 +161,8 @@ class gazeNET(nn.Module):
         if (torch.cuda.device_count()>0):
             torch.cuda.manual_seed(seed)
 
-        if config['architecture'].has_key('conv_stack'):
+        # if config['architecture'].has_key('conv_stack'):
+        if 'conv_stack' in config['architecture']:
             ## convolutional stack
             conv_config = config['architecture']['conv_stack']
             conv_stack = []
@@ -163,7 +171,7 @@ class gazeNET(nn.Module):
             in_channels = 1
             for _conv in conv_config:
                 name, out_channels, kernel_size, stride = _conv
-                padding = map(lambda x: x/2, kernel_size)
+                padding = map(lambda x: x//2, kernel_size)
                 _conv = nn.Conv2d(in_channels, out_channels,
                               kernel_size=tuple(kernel_size), stride=tuple(stride),
                               padding = tuple(padding),
@@ -190,7 +198,7 @@ class gazeNET(nn.Module):
         rnn_stack = []
         for _rnn in rnn_config:
             name, hidden_size, batch_norm, bidirectional = _rnn
-            _rnn = BatchRNN(input_size=rnn_input_size, hidden_size=hidden_size,
+            _rnn = BatchRNN(input_size=int(rnn_input_size), hidden_size=hidden_size,
                             bidirectional=bidirectional, batch_norm=batch_norm,
                             keep_prob = config['keep_prob'])
             rnn_stack.append((name, _rnn))
