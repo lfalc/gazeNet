@@ -17,7 +17,7 @@ plt.ion()
 #import seaborn as sns
 
 #TODO: fix importing
-from utils_lib.utils import round_up_to_odd, rolling_window
+from utils import round_up_to_odd, rolling_window
 
 
 def get_px2deg(geom):
