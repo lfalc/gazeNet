@@ -17,7 +17,7 @@ plt.ion()
 #import seaborn as sns
 
 #TODO: fix importing
-from utils import round_up_to_odd, rolling_window
+from utils_lib.utils import round_up_to_odd, rolling_window
 
 
 def get_px2deg(geom):
@@ -143,7 +143,7 @@ class ETData():
         ('t', np.float64),
         ('x', np.float32),
         ('y', np.float32),
-        ('status', np.bool),
+        ('status', np.bool_),
         ('evt', np.uint8)
     ])
     evt_color_map = dict({
@@ -174,7 +174,8 @@ class ETData():
                                           type of ETData.dtype
         """
 
-        if not(kwargs.has_key('source')):
+        # if not(kwargs.has_key('source')):
+        if not('source' in kwargs):
             try:
                 self.data = np.load(fpath)
             except:
@@ -185,7 +186,7 @@ class ETData():
 
             if kwargs['source']=='array':
                 if not fpath.dtype == ETData.dtype:
-                    print "Error. Data types do not match"
+                    print ("Error. Data types do not match")
                     return False
                 self.data = fpath
 
@@ -262,7 +263,7 @@ class ETData():
         ax00.plot(self.data['t'], self.data['x'], '-')
         ax10.plot(self.data['t'], self.data['y'], '-')
         ax01.plot(self.data['x'], self.data['y'], '-')
-        for e, c in ETData.evt_color_map.iteritems():
+        for e, c in ETData.evt_color_map.items():
             mask = self.data['evt'] == e
             ax00.plot(self.data['t'][mask], self.data['x'][mask], '.', color = c)
             ax10.plot(self.data['t'][mask], self.data['y'][mask], '.', color = c)
