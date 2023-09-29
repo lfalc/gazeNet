@@ -1,0 +1,14 @@
+ # gazeNet was developed on linux using Python 2.7 and PyTorch 0.2.0_4. 
+ # Other required packages: `numpy`, `pandas`, `tensorboard`, `Levenshtein`, `scikit-learn`
+
+###### Requirements without Version Specifiers ######
+numpy
+pandas
+tensorboard
+Levenshtein
+scikit-learn
+tqdm
+matplotlib
+
+###### Requirements with Version Specifiers ######
+torch>=0.2.0_4
