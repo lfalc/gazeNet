@@ -177,9 +177,13 @@ def eval_evt(etdata_gt, etdata_pr, n_events):
 
 def run_infer(model, n_samples, data_loader, **kwargs):
     fs = 500.
-    cuda = False if not(kwargs.has_key("cuda")) else kwargs["cuda"]
-    use_tqdm = False if not(kwargs.has_key("use_tqdm")) else kwargs["use_tqdm"]
-    perform_eval = True if not(kwargs.has_key("eval")) else kwargs["eval"]
+    # cuda = False if not(kwargs.has_key("cuda")) else kwargs["cuda"]
+    # use_tqdm = False if not(kwargs.has_key("use_tqdm")) else kwargs["use_tqdm"]
+    # perform_eval = True if not(kwargs.has_key("eval")) else kwargs["eval"]
+    cuda = False if not("cuda" in kwargs) else kwargs["cuda"]
+    use_tqdm = False if not("use_tqdm" in kwargs) else kwargs["use_tqdm"]
+    perform_eval = True if not("eval" in kwargs) else kwargs["eval"]
+
     #save_dir = None if not(kwargs.has_key("save_dir")) else kwargs["save_dir"]
 
     etdata_pr = ETData()
@@ -195,12 +199,12 @@ def run_infer(model, n_samples, data_loader, **kwargs):
         inputs, targets, input_percentages, target_sizes, aux = data
 
         #do forward pass
-        inputs = Variable(inputs, volatile=True).contiguous()
+        inputs = inputs.contiguous()
         if cuda:
             inputs = inputs.cuda()
         y = model(inputs)
         seq_length = y.size(1)
-        sizes = Variable(input_percentages.mul(int(seq_length)).int())
+        sizes = input_percentages.mul(int(seq_length)).int()
 
         if cuda:
             inputs = inputs.cpu()
