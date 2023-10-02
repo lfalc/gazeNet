@@ -4,12 +4,18 @@ The samples are stored in a numpy array of ETData format.
 '''
 import pandas as pd
 import numpy as np
-import csv
 
 from utils_lib.etdata import ETData, get_px2deg
 
-fpath = 'etdata\\tobii\\Kreuze_Random Recording1.tsv'
+fpath = 'etdata\\tobii\\Kreuze_Random Recording1_filtered.tsv'
 raw_data = pd.read_csv(fpath, sep='\t', header=0)
+
+#%% remove mouse samples and invalid samples
+mask = (raw_data['Sensor'] == 'Eye Tracker') \
+    & (raw_data['Validity left'] == 'Valid') \
+    & (raw_data['Validity right'] == 'Valid')
+raw_data = raw_data[mask]
+raw_data.reset_index(drop=True, inplace=True)
 
 geom = {
     'screen_width' : 16,
