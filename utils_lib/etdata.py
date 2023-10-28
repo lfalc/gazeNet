@@ -222,7 +222,7 @@ class ETData():
         ##debug
         #if (np.diff(t) == 0).any():
         #    stop
-        t = np.median(1/np.diff(t))
+        t = np.median(1/np.diff(t[:-2]))
         return fs.flat[np.abs(fs - t).argmin()]
 
     def calc_evt(self, fast=False):
