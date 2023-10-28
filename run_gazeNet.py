@@ -47,7 +47,7 @@ def get_arguments():
     return parser.parse_args()
 
 #%% init variables
-dev = False
+dev = True
 if dev:
     ROOT = './etdata'
     DATASET = 'lund2013_npy_test'
@@ -86,8 +86,12 @@ print ("Running testing")
 kwargs = {
     'cuda': cuda,
     'use_tqdm': False,
-    'eval': False,
+    'eval': True,
 }
+if kwargs['eval']:
+    with open('metrics.csv', 'w') as f:
+        f.write('fname,wer,cer,ke_all,ke_fix,ke_sac,ke_pso,ks_all,ks_fix,ks_sac,ks_pso\n')
+
 etdata_gt = ETData()
 etdata_pr = ETData()
 
@@ -115,7 +119,14 @@ for fpath in tqdm(FILES[:]):
                                 shuffle=False)
     #predict
     print ("Predicting %s" % fname)
-    _gt, _pr, pr_raw = run_infer(model, n_samples, test_loader, **kwargs)
+    if kwargs['eval']:
+        wer, cer, ke, ks, (_gt, _pr, pr_raw) = run_infer(model, n_samples, test_loader, **kwargs)
+        with open('metrics.csv', 'a') as f:
+            f.write('%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' % (fname, wer, cer,
+                                                            ke[0], ke[1], ke[2], ke[3],
+                                                            ks[0], ks[1], ks[2], ks[3]))
+    else:
+        _gt, _pr, pr_raw = run_infer(model, n_samples, test_loader, **kwargs)
 
     #glue back the predictions
     _data_pr = copy.deepcopy(test_dataset.data)
