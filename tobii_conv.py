@@ -22,11 +22,11 @@ for fname in files:
     raw_data.reset_index(drop=True, inplace=True)
 
     geom = {
-        'screen_width' : 16,
-        'screen_height': 9,
-        'display_width_pix' : raw_data['Recording resolution width'][0],
-        'display_height_pix' : raw_data['Recording resolution height'][0],
-        'eye_distance' : 80,
+        'screen_width' : 53,
+        'screen_height': 30,
+        'display_width_pix' : 1920,
+        'display_height_pix' : 1080,
+        'eye_distance' : 60,
     }
     px2deg = get_px2deg(geom)
 
