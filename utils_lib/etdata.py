@@ -140,7 +140,7 @@ def calc_event_data(etdata, evt,
     return posx_s, posx_e, posy_s, posy_e, posx_mean, posy_mean, posx_med, posy_med, pv, pv_index, rms, std
 
 
-def tsv_to_npy(fname):
+def tsv_to_npy(fname, geom):
     with open(fname) as file:
         raw_data = pd.read_csv(file, sep='\t', header=0)
 
@@ -151,13 +151,6 @@ def tsv_to_npy(fname):
     raw_data = raw_data[mask]
     raw_data.reset_index(drop=True, inplace=True)
 
-    geom = {
-        'screen_width': 53,
-        'screen_height': 30,
-        'display_width_pix': 1920,
-        'display_height_pix': 1080,
-        'eye_distance': 60,
-    }
     px2deg = get_px2deg(geom)
 
     t = raw_data['Recording timestamp']
@@ -349,3 +342,12 @@ class ETData():
             mask = self.data['evt'] == e
             ax1.plot(self.data['t'][mask], self.data['x'][mask], '.', color=c)
             ax2.plot(self.data['t'][mask], self.data['y'][mask], '.', color=c)
+
+    def plot_xy(self, spath=None, save=False, show=True, title=None):
+        xy = plt.plot(self.data['x'], self.data['y'], '-')
+        # xy.set_xlabel('Position, px')
+        # xy.set_ylabel('Position, px')
+
+        for e, c in ETData.evt_color_map.items():
+            mask = self.data['evt'] == e
+            plt.plot(self.data['x'][mask], self.data['y'][mask], '.', color=c)
