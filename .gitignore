@@ -104,7 +104,6 @@ venv.bak/
 .mypy_cache/
 
 # etdata
-etdata/
 Kreuze_Random Recording1.tsv
 npy_explorer.py
 gazeNet.code-workspace
