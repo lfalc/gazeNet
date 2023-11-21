@@ -320,10 +320,15 @@ class ETData():
         if save and not (spath is None):
             plt.savefig('%s.png' % (spath))
             plt.close()
-
-    def plot_px(self, spath=None, save=False, show=True, title=None):
+            
+    def plot_px(self, spath=None, save=False, show=True):
         '''Plots trial in pixels
         '''
+        if show:
+            plt.ion()
+        else:
+            plt.ioff()
+
         fig, (ax1, ax2) = plt.subplots(2, 1)
         fig.suptitle('Gaze position over time')
         fig.set_size_inches(12, 8)
@@ -343,11 +348,30 @@ class ETData():
             ax1.plot(self.data['t'][mask], self.data['x'][mask], '.', color=c)
             ax2.plot(self.data['t'][mask], self.data['y'][mask], '.', color=c)
 
-    def plot_xy(self, spath=None, save=False, show=True, title=None):
-        xy = plt.plot(self.data['x'], self.data['y'], '-')
-        # xy.set_xlabel('Position, px')
-        # xy.set_ylabel('Position, px')
+        if save and not (spath is None):
+            plt.savefig('%s_over_time.png' % (spath))
+            plt.close()
+
+    def plot_xy(self, spath=None, save=False, show=True):
+        '''create x-y plot of gaze position
+        '''
+        if show:
+            plt.ion()
+        else:
+            plt.ioff()
+
+        fig, xy = plt.subplots()
+        fig.suptitle('Gaze position')
+        fig.set_size_inches(12, 8)
+        
+        xy.plot(self.data['x'], self.data['y'], '-')
+        xy.set_xlabel('Position, px')
+        xy.set_ylabel('Position, px')
 
         for e, c in ETData.evt_color_map.items():
             mask = self.data['evt'] == e
             plt.plot(self.data['x'][mask], self.data['y'][mask], '.', color=c)
+
+        if save and not (spath is None):
+            plt.savefig('%s_xy_plot.png' % (spath))
+            plt.close()
