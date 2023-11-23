@@ -167,7 +167,7 @@ def tsv_to_npy(fname, geom):
     evt[:] = True
     data = np.vstack((t, x_deg, y_deg, status, evt)).T
     data = np.core.records.fromarrays(data.T, dtype=ETData.dtype)
-    return x, y, data
+    return x, y, data, raw_data
 
 
 class ETData():
