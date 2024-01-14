@@ -320,7 +320,7 @@ class ETData():
         if save and not (spath is None):
             plt.savefig('%s.png' % (spath))
             plt.close()
-            
+
     def plot_px(self, spath=None, save=False, show=True):
         '''Plots trial in pixels
         '''
@@ -363,7 +363,7 @@ class ETData():
         fig, xy = plt.subplots()
         fig.suptitle('Gaze position')
         fig.set_size_inches(12, 8)
-        
+
         xy.plot(self.data['x'], self.data['y'], '-')
         xy.set_xlabel('Position, px')
         xy.set_ylabel('Position, px')
@@ -374,4 +374,62 @@ class ETData():
 
         if save and not (spath is None):
             plt.savefig('%s_xy_plot.png' % (spath))
+            plt.close()
+
+    def plot_speed(self, spath=None, save=False, show=True):
+        '''
+        calculate speed from relative position between samples
+        create speed plot of gaze position
+        '''
+        if show:
+            plt.ion()
+        else:
+            plt.ioff()
+
+        x_speed = np.diff(self.data['x'], prepend=self.data['x'][0])
+        y_speed = np.diff(self.data['y'], prepend=self.data['y'][0])
+        speed = np.hypot(x_speed, y_speed)
+            
+        fig, sp = plt.subplots()
+        fig.suptitle('Gaze speed')
+        fig.set_size_inches(18, 8)
+
+        # sp.plot(self.data['t'], speed, '.')
+        sp.set_xlabel('Time, s')
+        sp.set_ylabel('Speed, px/sample')
+
+        for e, c in ETData.evt_color_map.items():
+            if e == 3:
+                continue
+            mask = (self.data['evt'] == e)
+            # plt.yscale('log')
+            plt.plot(self.data['t'][mask], speed[mask], '.', color=c)
+
+        # stimuli = [66862,
+        #            69512,
+        #            72379,
+        #            75179,
+        #            79629,
+        #            83012,
+        #            86945,
+        #            91245,
+        #            95362,
+        #            98612,
+        #            101579,
+        #            104629,
+        #            108745
+        #            ]
+        stimuli = [66862,
+                   69512,
+                   72379,
+                   75179
+                   ]
+        
+        stimuli = [stimuli[i]-stimuli[0] for i in range(len(stimuli))]
+
+        for s in stimuli:
+            plt.axvline(x=s/3333, color='k', linestyle='--')
+
+        if save and not (spath is None):
+            plt.savefig('%s_speed_plot.png' % (spath))
             plt.close()
