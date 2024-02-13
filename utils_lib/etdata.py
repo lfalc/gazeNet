@@ -256,7 +256,8 @@ class ETData():
         # if (np.diff(t) == 0).any():
         #    stop
         t = np.median(1/np.diff(t[:-2]))
-        return fs.flat[np.abs(fs - t).argmin()]
+        # return fs.flat[np.abs(fs - t).argmin()]
+        return 300
 
     def calc_evt(self, fast=False):
         '''Calculated event data
@@ -336,12 +337,12 @@ class ETData():
         # upper plot
         ax1.plot(self.data['t'], self.data['x'], '-')
         ax1.set_xlabel('Time, s')
-        ax1.set_ylabel('Position, px')
+        ax1.set_ylabel('x-coordinate, px')
 
         # lower plot
         ax2.plot(self.data['t'], self.data['y'], '-')
         ax2.set_xlabel('Time, s')
-        ax2.set_ylabel('Position, px')
+        ax2.set_ylabel('y-coordinate, px')
 
         for e, c in ETData.evt_color_map.items():
             mask = self.data['evt'] == e
@@ -419,16 +420,16 @@ class ETData():
         #            104629,
         #            108745
         #            ]
-        stimuli = [66862,
-                   69512,
-                   72379,
-                   75179
-                   ]
+        # stimuli = [66862,
+        #            69512,
+        #            72379,
+        #            75179
+        #            ]
         
-        stimuli = [stimuli[i]-stimuli[0] for i in range(len(stimuli))]
+        # stimuli = [stimuli[i]-stimuli[0] for i in range(len(stimuli))]
 
-        for s in stimuli:
-            plt.axvline(x=s/3333, color='k', linestyle='--')
+        # for s in stimuli:
+        #     plt.axvline(x=s/3333, color='k', linestyle='--')
 
         if save and not (spath is None):
             plt.savefig('%s_speed_plot.png' % (spath))
