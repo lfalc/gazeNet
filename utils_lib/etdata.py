@@ -12,6 +12,7 @@ import pandas as pd
 import scipy.signal as sg
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 plt.rcParams['image.cmap'] = 'gray'
 plt.rc("axes.spines", top=False, right=False)
 plt.ion()
@@ -331,18 +332,33 @@ class ETData():
             plt.ioff()
 
         fig, (ax1, ax2) = plt.subplots(2, 1)
-        fig.suptitle('Gaze position over time')
-        fig.set_size_inches(12, 8)
+        # fig.suptitle('Gaze position over time')
+        fig.set_size_inches(10, 6)
 
         # upper plot
         ax1.plot(self.data['t'], self.data['x'], '-')
-        ax1.set_xlabel('Time, s')
-        ax1.set_ylabel('x-coordinate, px')
+        ax1.set_xlabel('time in s')
+        ax1.set_ylabel('x-coordinate in px')
+        ax1.grid(True)
 
+        saccade_proxy = mpatches.Patch(color='red', label='Saccade')
+        fixation_proxy = mpatches.Patch(color='blue', label='Fixation')
+        pso_proxy = mpatches.Patch(color='yellow', label='PSO')
+
+        ax1.plot([], [], 'ro', label='Saccade')
+        ax1.plot([], [], 'bo', label='Fixation')
+        ax1.plot([], [], 'yo', label='PSO')
+
+        ax1.legend(handles=[saccade_proxy, fixation_proxy, pso_proxy], loc='upper left')
+
+        # Legend
+        ax1.legend(['gaze','Saccade', 'Fixation', 'PSO'], loc='lower right')
+        
         # lower plot
         ax2.plot(self.data['t'], self.data['y'], '-')
-        ax2.set_xlabel('Time, s')
-        ax2.set_ylabel('y-coordinate, px')
+        ax2.set_xlabel('time in s')
+        ax2.set_ylabel('y-coordinate in px')
+        ax2.grid(True)
 
         for e, c in ETData.evt_color_map.items():
             mask = self.data['evt'] == e
